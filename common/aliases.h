@@ -4,13 +4,13 @@
 #include <vector>
 #include <string>
 
-#include "../instruction/instruction.h"
-
 union data_t {
 	uint64_t _unsigned;
 	int64_t  _signed;
 };
+struct instruction_t;
 using memory_addr_t = uint64_t;
+using offset_t = int64_t;
 using reg_id_t = std::string;
 using i_cache_t = std::vector<instruction_t>;
 using d_cache_t = std::unordered_map<memory_addr_t, data_t>;

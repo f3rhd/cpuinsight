@@ -1,4 +1,5 @@
-#include "aliases.h"
+#pragma  once
+#include "../common/aliases.h"
 
 class CPU {
 
