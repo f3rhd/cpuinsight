@@ -45,3 +45,14 @@ data_t CPU::reg_file_read(const reg_id_t& reg_id) {
 	return _reg_file[reg_id];
 }
 
+void CPU::execute() {
+	if(_pc >= _program.size())
+		return;
+	_program[_pc]->execute(*this);
+	_pc++;
+}
+void CPU::reset() {
+	_pc = 0;
+	_d_cache.clear();
+	_reg_file.clear();
+}

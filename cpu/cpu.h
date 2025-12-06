@@ -1,8 +1,10 @@
-#include "../common/aliases.h"
+#include "../aliases.h"
 #pragma  once
 class CPU {
 
 public:
+	void 			execute();
+	void 			reset();
 	void			d_cache_commit(memory_addr_t mem_addr, data_t data);
 	void			reg_file_commit(const reg_id_t& reg_id, data_t data);
 	data_t			d_cache_read(memory_addr_t addr);

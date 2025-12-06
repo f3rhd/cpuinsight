@@ -146,3 +146,11 @@ void jump_instruction_t::execute(CPU& cpu) {
     }
     cpu.reg_file_commit(dest_reg, { pc_next });
 }
+
+void auipc_instruction_t::execute(CPU& cpu) {
+    int64_t pc_val = cpu.get_pc();
+    int64_t val = upimm & (0xFFFFFFFFFF000000);
+    data_t commit_data = data_t();
+    commit_data._signed = pc_val + val;
+    cpu.reg_file_commit(dest_reg, commit_data);
+}

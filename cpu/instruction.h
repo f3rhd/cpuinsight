@@ -1,5 +1,5 @@
 #pragma once
-#include "../common/aliases.h"
+#include "../aliases.h"
 class CPU;
 struct instruction_t {
     virtual void execute(CPU &cpu) = 0;
@@ -20,12 +20,6 @@ struct memory_instruction_t : instruction_t {
         base_reg(base_reg_),
         offset(offset_) {}
 };
-struct r_type_instruction_t : instruction_t {
-    reg_id_t dest_reg;
-    reg_id_t src1_reg;
-    reg_id_t src2_reg;
-    void execute(CPU &cpu) override = 0;
-};
 struct load_instruction_t : memory_instruction_t {
     enum class LOAD_INSTRUCTION_TYPE
     {
@@ -34,6 +28,7 @@ struct load_instruction_t : memory_instruction_t {
         LW,
         LBU,
         LHU,
+        UNKNOWN
     } type;
     void execute(CPU &cpu) override;
     load_instruction_t(
@@ -49,7 +44,8 @@ struct store_instruction_t : memory_instruction_t {
     {
         SB,
         SH,
-        SW
+        SW,
+        UNKNOWN
     } type;
     void execute(CPU &cpu) override;
     store_instruction_t(
@@ -72,7 +68,8 @@ struct alu_instruction_t : instruction_t {
         SRL,
         SRA,
         OR,
-        AND
+        AND,
+        UNKNOWN
     };
     union _src2_ {
         reg_id_t src2_reg;
@@ -107,6 +104,12 @@ struct load_upper_imm_instruction_t : instruction_t {
     load_upper_imm_instruction_t(reg_id_t dest_reg_,int64_t upimm_) : dest_reg(dest_reg_),upimm(upimm_) {}
     void execute(CPU &cpu) override;
 }; 
+struct auipc_instruction_t : instruction_t {
+    reg_id_t dest_reg;
+    int64_t upimm;
+    auipc_instruction_t(reg_id_t dest_reg_,int64_t upimm_) : dest_reg(dest_reg_),upimm(upimm_) {}
+    void execute(CPU &cpu) override;
+};
 struct branch_instruction_t : instruction_t {
     enum class BRANCH_INSTRUCTION_TYPE
     {
@@ -115,7 +118,8 @@ struct branch_instruction_t : instruction_t {
         BLT,
         BGE,
         BLTU,
-        BGEU
+        BGEU,
+        UNKNOWN
     } type;
     reg_id_t src1_reg;
     reg_id_t src2_reg;
@@ -137,7 +141,8 @@ struct jump_instruction_t : instruction_t {
     enum class JUMP_INSTRUCTION_TYPE
     {
         JALR,
-        JAL
+        JAL,
+        UNKNOWN
     } type;
     reg_id_t dest_reg;
     label_id_t label_id; // jal uses this
