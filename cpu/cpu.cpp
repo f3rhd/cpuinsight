@@ -1,6 +1,7 @@
 #include "cpu.h"
 #include "instruction.h"
 #include <iostream>
+#include <iomanip>
 
 void CPU::d_cache_commit(memory_addr_t mem_addr, data_t data) {
 	if (_d_cache.find(mem_addr) == _d_cache.end()) 
@@ -25,8 +26,8 @@ void CPU::reg_file_commit(const reg_id_t& reg_id, data_t data) {
 void CPU::jump_to_label(label_id_t label_) {
 	size_t program_size = _program.size();
 	for (size_t i = 0; i < program_size; ++i) {
-		if (_program[i]->label() == label_) {
-			_pc = static_cast<memory_addr_t>(i + 1);
+		if (_program[i]->is_label_instruction() && _program[i]->label() == label_) {
+			_pc = static_cast<memory_addr_t>(i);
 			return;
 		}
 	}
@@ -38,6 +39,36 @@ void CPU::update_pc(memory_addr_t next_pc_val) {
 
 void CPU::load_program(program_t&& program_) {
 	_program = std::move(program_);
+}
+
+void CPU::log(std::ostream& os) {
+    const size_t COLS = 4;
+    
+    const int VAL_WIDTH = 12; 
+
+    os << "--------------------------------------------------------------\n";
+    os << "CPU Register File (Signed Values) \n";
+    os << "--------------------------------------------------------------\n";
+
+    for (size_t reg_id = 0; reg_id < 32; reg_id++) {
+        os << std::left << "x" << std::setw(2) << reg_id << ": ";
+        
+        os << std::right << std::setw(VAL_WIDTH) 
+           << _reg_file[static_cast<reg_id_t>(reg_id)]._signed;
+
+        // Check if we need to start a new line
+        if ((reg_id + 1) % COLS == 0) {
+            os << "\n";
+        } else {
+            os << "  |  "; 
+        }
+    }
+    
+    if (32 % COLS != 0) {
+        os << "\n";
+    }
+
+    os << "--------------------------------------------------------------\n";
 }
 
 memory_addr_t CPU::get_pc() const {
@@ -57,10 +88,22 @@ data_t CPU::reg_file_read(const reg_id_t& reg_id) {
 	return _reg_file[reg_id];
 }
 
+CPU::CPU() {
+	for (reg_id_t i = 0; i < 32; i++) {
+		_reg_file.emplace(i,  0l);
+	}
+	_program = program_t();
+	_d_cache = d_cache_t();
+}
+
 void CPU::execute() {
-	if(_pc >= _program.size() && !_halt)
+	if (_pc >= _program.size() && !_halt) {
 		_halt = true;
 		return;
+	}
+	if (_program[_pc]->is_label_instruction()) {
+		_pc++;
+	}
 	_program[_pc]->execute(*this);
 	_pc++;
 }
@@ -69,6 +112,6 @@ void CPU::reset() {
 	_d_cache.clear();
 	_reg_file.clear();
 }
-bool CPU::halt() {
+bool CPU::halt() const {
 	return _halt;
 }

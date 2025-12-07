@@ -12,4 +12,8 @@ int main(int argc,char** argv) {
     parser_t parser;
     CPU      cpu;
     cpu.load_program(parser.parse_program(std::string(input_file)));
+    while (!cpu.halt()) {
+        cpu.execute();
+        cpu.log(std::cout);
+    }
 }

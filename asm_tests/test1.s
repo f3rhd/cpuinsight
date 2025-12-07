@@ -1,3 +1,7 @@
-main:
-	add x1,x2,x3;
-	add x2,x3,x1;
+addi x2,x0,10
+loop:
+	addi x1,x1,1
+	beq  x1,x2,end
+	beq x0,x0,loop
+end:
+	add x0,x0,x0

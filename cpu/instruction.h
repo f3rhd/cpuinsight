@@ -4,6 +4,7 @@ class CPU;
 struct instruction_t {
     virtual void execute(CPU &cpu) = 0;
     virtual label_id_t label() { return no_label; }
+    virtual bool is_label_instruction() { return false; }
     virtual ~instruction_t() = default;
 };
 struct memory_instruction_t : instruction_t {
@@ -169,4 +170,5 @@ struct label_instruction_t :  instruction_t {
     label_instruction_t(label_id_t label_) : label_id(label_) {}
     label_id_t label() override { return label_id; }
     void execute(CPU &cpu) override {} 
+    bool is_label_instruction() override { return true; }
 };
