@@ -7,7 +7,7 @@
 #define EXPECT(EXPECTED_TOKEN_TYPE)                   \
     if (_current_token->type != EXPECTED_TOKEN_TYPE)   \
     {                                                 \
-        std::cout << "Error : Token did not meet the expected type(Cause : " << _current_token->word << ")" ;               \
+        std::cout << "Error : Token did not meet the expected type(Cause : " << _current_token->word << ")\n" ;               \
         exit(EXIT_FAILURE);                                       \
     }                                                             \
     

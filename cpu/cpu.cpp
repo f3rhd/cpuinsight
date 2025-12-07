@@ -50,6 +50,7 @@ void CPU::log(std::ostream& os) {
     os << "CPU Register File (Signed Values) \n";
     os << "--------------------------------------------------------------\n";
 
+	os << "PC : " << _pc << '\n';
     for (size_t reg_id = 0; reg_id < 32; reg_id++) {
         os << std::left << "x" << std::setw(2) << reg_id << ": ";
         
