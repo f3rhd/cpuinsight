@@ -6,9 +6,11 @@
 #include <memory>
 #include <string>
 
-auto constexpr no_label = 0;
-auto constexpr forward_label = 1;
-auto constexpr invalid_reg_id = 255;
+auto constexpr NO_LABEL = 0;
+auto constexpr FORWARD_LABEL = 1;
+auto constexpr INVALID_REG_ID = 255;
+auto constexpr SHIFT_REGISTER_SIZE = 8;
+auto constexpr FSM_STATE_BITS = 2;
 union data_t {
 	uint64_t _unsigned;
 	int64_t  _signed;
@@ -23,4 +25,4 @@ using program_t = std::vector<std::unique_ptr<instruction_t>>;
 using d_cache_t = std::unordered_map<memory_addr_t, data_t>;
 using reg_file_t = std::unordered_map<reg_id_t, data_t>;
 using branch_history_t = uint8_t;
-using branch_lookup_t = std::unordered_map<branch_instruction_id_t, std::pair<const std::string*,branch_history_t>>;
+using branch_history_table_t = std::unordered_map<branch_instruction_id_t, branch_history_t>;
