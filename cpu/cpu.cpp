@@ -50,7 +50,6 @@ void CPU::log(std::ostream& os) {
     os << "CPU Register File (Signed Values) \n";
     os << "--------------------------------------------------------------\n";
 
-	os << "PC : " << _pc << '\n';
     for (size_t reg_id = 0; reg_id < 32; reg_id++) {
         os << std::left << "x" << std::setw(2) << reg_id << ": ";
         
@@ -70,6 +69,18 @@ void CPU::log(std::ostream& os) {
     }
 
     os << "--------------------------------------------------------------\n";
+	os << "Total Branch Executions : " << _total_branches << "\n";
+	os << "Correct Predictions : " << _correct_predictions << "\n";
+	os << "Prediction Accuracy : " << static_cast<float>(_correct_predictions) / static_cast<float>(_total_branches) * 100.0f << "%\n";
+    os << "--------------------------------------------------------------\n";
+}
+
+void CPU::incr_correct_predictions() {
+	_correct_predictions++;
+}
+
+void CPU::incr_total_branches() {
+	_total_branches++;
 }
 
 memory_addr_t CPU::get_pc() const {
@@ -89,7 +100,24 @@ data_t CPU::reg_file_read(const reg_id_t& reg_id) {
 	return _reg_file[reg_id];
 }
 
-CPU::CPU() {
+CPU::CPU(CPU::PREDICTOR_TYPE type) {
+	switch (type) {
+	case(CPU::PREDICTOR_TYPE::SIMPLE):
+		_branch_predictor = std::make_unique<simple_predictor_t>();
+		break;
+	case(CPU::PREDICTOR_TYPE::GAg):
+		_branch_predictor = std::make_unique<GAg_predictor_t>();
+		break;
+	case(CPU::PREDICTOR_TYPE::PAg):
+		_branch_predictor = std::make_unique<PAg_predictor_t>();
+		break;
+	case(CPU::PREDICTOR_TYPE::GSHARE):
+		_branch_predictor = std::make_unique<gshare_predictor_t>();
+		break;
+	// shouldnt happen
+	default:
+		break;
+	}
 	for (reg_id_t i = 0; i < 32; i++) {
 		_reg_file.emplace(i,  0l);
 	}
@@ -108,6 +136,15 @@ void CPU::execute() {
 	_program[_pc]->execute(*this);
 	_pc++;
 }
+
+void CPU::update_bht(branch_instruction_id_t branch_label, bool branch_direction) {
+	_branch_predictor->update(branch_label, branch_direction);
+}
+
+bool CPU::predict_branch(branch_instruction_id_t branch_label) {
+	return _branch_predictor->predict(branch_label);
+}
+
 void CPU::reset() {
 	_pc = 0;
 	_d_cache.clear();

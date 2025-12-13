@@ -1,11 +1,19 @@
 #include "../aliases.h"
+#include "branchpredictor.h"
 #include <ostream>
 #pragma  once
 class CPU {
-
 public:
-	CPU();
+	enum class PREDICTOR_TYPE {
+		SIMPLE,
+		GAg,
+		PAg,
+		GSHARE
+	};
+	CPU(PREDICTOR_TYPE type);
 	void 			execute();
+	void			update_bht(branch_instruction_id_t branch_label, bool branch_direction);
+    bool			predict_branch(branch_instruction_id_t branch_id);
 	void 			reset();
 	bool 			halt() const;
 	void			d_cache_commit(memory_addr_t mem_addr, data_t data);
@@ -16,6 +24,8 @@ public:
 	void			update_pc(memory_addr_t next_pc_val);
 	void			load_program(program_t&& program_);
 	void			log(std::ostream& os);
+	void			incr_correct_predictions();
+	void			incr_total_branches();
 	memory_addr_t	get_pc() const;
 private:
 	bool _halt = false;
@@ -23,4 +33,7 @@ private:
 	program_t _program;
 	d_cache_t _d_cache;
 	reg_file_t _reg_file;
+	std::unique_ptr<branch_predictor_t> _branch_predictor;
+	uint64_t _correct_predictions = 0;
+	uint64_t _total_branches = 0;
 };
