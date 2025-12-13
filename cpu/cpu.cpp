@@ -71,6 +71,7 @@ void CPU::log(std::ostream& os) {
     os << "--------------------------------------------------------------\n";
 	os << "Total Branch Executions : " << _total_branches << "\n";
 	os << "Correct Predictions : " << _correct_predictions << "\n";
+	os << "Total Mispredictions : " << _total_branches - _correct_predictions << "\n";
 	os << "Prediction Accuracy : " << static_cast<float>(_correct_predictions) / static_cast<float>(_total_branches) * 100.0f << "%\n";
     os << "--------------------------------------------------------------\n";
 }
@@ -119,7 +120,7 @@ CPU::CPU(CPU::PREDICTOR_TYPE type) {
 		break;
 	}
 	for (reg_id_t i = 0; i < 32; i++) {
-		_reg_file.emplace(i,  0l);
+		_reg_file[i]._unsigned = 0ull;
 	}
 	_program = program_t();
 	_d_cache = d_cache_t();
