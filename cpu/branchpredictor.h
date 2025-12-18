@@ -23,7 +23,7 @@ public:
     bool predict(branch_instruction_id_t branch_id) override;
 private:
     uint64_t _branch_shift_register = 0;
-    std::unordered_map<uint64_t, uint8_t> _pattern_history_table;
+    std::unordered_map<uint64_t, branch_history_t> _pattern_history_table;
 };
 // per branch history shift register per branch instruction, adaptive predictor (2bit fsm saturating counter), global pattern history table
 class PAg_predictor_t : public branch_predictor_t {
@@ -32,7 +32,7 @@ public:
     bool predict(branch_instruction_id_t branch_id) override;
 private:
     std::unordered_map<branch_instruction_id_t, uint64_t> _branch_history_shift_register_table;
-    std::unordered_map<uint64_t, uint8_t> _pattern_history_table;
+    std::unordered_map<uint64_t, branch_history_t> _pattern_history_table;
 };
 
 class gshare_predictor_t : public branch_predictor_t {
@@ -41,5 +41,5 @@ public:
     bool predict(branch_instruction_id_t branch_id) override;
 private:
     uint64_t _branch_shift_register = 0;
-    std::unordered_map<uint64_t, uint8_t> _pattern_history_table;
+    std::unordered_map<uint64_t, branch_history_t> _pattern_history_table;
 };
