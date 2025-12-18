@@ -123,7 +123,7 @@ void alu_instruction_t::execute(CPU& cpu) {
 
 void load_upper_imm_instruction_t::execute(CPU& cpu) {
     int32_t imm32 = (int32_t)(_upimm & 0xFFFFF000); 
-    data_t commit_data = {(int64_t)imm32}; 
+    data_t commit_data = { static_cast<uint64_t>(static_cast<uint32_t>(imm32)) };
     cpu.reg_file_commit(_dest_reg,commit_data);
 }
 
