@@ -14,7 +14,7 @@
 program_t&& parser_t::parse_program(const std::string& src) {
 	std::ifstream file(src);
 	if (!file.is_open()) {
-		std::cout << "File path " << src << " doesn't exist.\n";
+		std::cout << "\033[31m" << "Error: \033" << "File path " << src << " doesn't exist.\n";
 		exit(EXIT_FAILURE);
 	}
 	std::string line_raw;
@@ -31,7 +31,7 @@ program_t&& parser_t::parse_program(const std::string& src) {
 			branch_instruction_data.first->set_target_label(_label_map.at(branch_instruction_data.second));
 		}
 		else {
-			std::cout << "Error : Unknown label identifier was found(Cause : " << branch_instruction_data.second << ")";
+			std::cout << "\033[31m" << "Error\033: Unknown label identifier was found(Cause : " << branch_instruction_data.second << ")";
 		}
 	}
 	for (auto& jump_instruction_data : _unresolved_jump_instructions) {
@@ -39,7 +39,7 @@ program_t&& parser_t::parse_program(const std::string& src) {
 			jump_instruction_data.first->set_target_label(_label_map.at(jump_instruction_data.second));
 		}
 		else {
-			std::cout << "Error : Unknown label identifier was found(Cause : " << jump_instruction_data.second << ")";
+			std::cout << "\033[31m" << "Error\033: Unknown label identifier was found(Cause : " << jump_instruction_data.second << ")";
 		}
 	}
 	file.close();
