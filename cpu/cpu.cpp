@@ -176,7 +176,9 @@ bool CPU::predict_branch(branch_instruction_id_t branch_label) const {
 void CPU::reset() {
 	_pc = 0;
 	_d_cache.clear();
-	_reg_file.clear();
+	for (auto& [id, value] : _reg_file) {
+		value._signed = 0;
+	}
 	_total_branches = 0;
 	_cycles = 0;
 	_correct_predictions = 0;
