@@ -187,9 +187,9 @@ namespace gui {
 
 						ImGui::TableNextColumn();
 						if (hex_ver) 
-								ImGui::Text("0x%X", signed_ver ? data._signed : data._unsigned);
+								ImGui::Text("0x%X", signed_ver ? data: data);
 							else 
-								ImGui::Text(signed_ver ? "%lld" : "%llu", signed_ver ? data._signed : data._unsigned);
+								ImGui::Text(signed_ver ? "%lld" : "%llu", signed_ver ? static_cast<int8_t>(data) : data);
 					}
 				}
 				ImGui::EndTable();

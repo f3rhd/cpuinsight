@@ -3,13 +3,30 @@
 #include <iostream>
 #include <iomanip>
 
-void CPU::d_cache_commit(memory_addr_t mem_addr, data_t data) {
-	if (_d_cache.find(mem_addr) == _d_cache.end()) {
-		_cycles += CACHE_MISS_PENALTY;
-		_d_cache.emplace(mem_addr, data);
+void CPU::d_cache_commit(store_instruction_t::STORE_INSTRUCTION_TYPE mode, memory_addr_t mem_addr, data_t data) {
+	uint8_t first{ static_cast<uint8_t>(data._unsigned & 0xFF) };
+	uint8_t second{ static_cast<uint8_t>((data._unsigned >> 8) & 0xFF) };
+	uint8_t third{ static_cast<uint8_t>((data._unsigned >> 16) & 0xFF) };
+	uint8_t forth{ static_cast<uint8_t>((data._unsigned >> 24) & 0xFF) };
+	switch (mode) {
+	case store_instruction_t::STORE_INSTRUCTION_TYPE::SB:
+		_d_cache.insert_or_assign(mem_addr, first);
+		break;
+	case store_instruction_t::STORE_INSTRUCTION_TYPE::SH:
+		_d_cache.insert_or_assign(mem_addr, first);
+		_d_cache.insert_or_assign(mem_addr + 1, second);
+		break;
+	case store_instruction_t::STORE_INSTRUCTION_TYPE::SW:
+		_d_cache.insert_or_assign(mem_addr, first);
+		_d_cache.insert_or_assign(mem_addr + 1, second);
+		_d_cache.insert_or_assign(mem_addr + 2, third);
+		_d_cache.insert_or_assign(mem_addr + 3, forth);
+	break;
+	case store_instruction_t::STORE_INSTRUCTION_TYPE::UNKNOWN:
+		break;
+	default:
+		break;
 	}
-	else
-		_d_cache[mem_addr] = data;
 }
 
 void CPU::reg_file_commit(const reg_id_t& reg_id, data_t data) {
@@ -111,12 +128,42 @@ const cpu_dcache_t& CPU::get_dcache() const {
 	return _d_cache;
 }
 
-const data_t& CPU::d_cache_read(memory_addr_t addr) {
-	if (_d_cache.find(addr) == _d_cache.end()) {
-		_cycles += CACHE_MISS_PENALTY;
-		return _reg_file[0];
+data_t CPU::d_cache_read(load_instruction_t::LOAD_INSTRUCTION_TYPE mode, memory_addr_t addr) {
+	data_t result{};
+	switch (mode) {
+	case load_instruction_t::LOAD_INSTRUCTION_TYPE::LB:
+	{
+		int8_t byte(static_cast<int8_t>(_d_cache[addr]));
+		result._signed = static_cast<int32_t>(byte);
 	}
-	return _d_cache[addr];
+		break;
+	case load_instruction_t::LOAD_INSTRUCTION_TYPE::LH:
+	{
+		int16_t half((static_cast<uint16_t>(_d_cache[addr])) |
+			(static_cast<uint16_t>(_d_cache[addr + 1]) << 8));
+		result._signed = static_cast<int32_t>(half);
+	}
+		break;
+	case load_instruction_t::LOAD_INSTRUCTION_TYPE::LW:
+		result._unsigned = (static_cast<uint32_t>(_d_cache[addr])) |
+		(static_cast<uint32_t>(_d_cache[addr + 1]) << 8) |
+		(static_cast<uint32_t>(_d_cache[addr + 2]) << 16) |
+		(static_cast<uint32_t>(_d_cache[addr + 3]) << 24);
+		break;
+	case load_instruction_t::LOAD_INSTRUCTION_TYPE::LBU:
+		result._unsigned = static_cast<uint32_t>(_d_cache[addr]);
+		break;
+	case load_instruction_t::LOAD_INSTRUCTION_TYPE::LHU:
+		result._unsigned = (static_cast<uint32_t>(_d_cache[addr])) |
+                           (static_cast<uint32_t>(_d_cache[addr + 1]) << 8);
+		break;
+	case load_instruction_t::LOAD_INSTRUCTION_TYPE::UNKNOWN:
+		break;
+	default:
+		break;
+
+		return result;
+	}
 }
 
 const data_t& CPU::reg_file_read(const reg_id_t& reg_id)  {

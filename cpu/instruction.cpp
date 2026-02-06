@@ -7,24 +7,7 @@ void load_instruction_t::execute(CPU& cpu) {
 	// calculate the addr
 	memory_addr_t addr = base_reg_val._unsigned + _offset;
 	// read from addr
-	data_t read_val = cpu.d_cache_read(addr); // this is the val that is going to be stored at destination register
-
-	switch (_type) {
-	case LOAD_INSTRUCTION_TYPE::LB:
-		read_val._signed &= (0x000000000000000F);
-		break;
-	case LOAD_INSTRUCTION_TYPE::LH:
-		read_val._signed &= (0x00000000FFFFFFFF);
-		break;
-	case LOAD_INSTRUCTION_TYPE::LBU:
-		read_val._unsigned &= (0x000000000000000F);
-		break;
-	case LOAD_INSTRUCTION_TYPE::LHU:
-		read_val._unsigned &= (0x00000000FFFFFFFF);
-		break;
-	case LOAD_INSTRUCTION_TYPE::LW:
-		break;
-	}
+	data_t read_val = cpu.d_cache_read(_type,addr); // this is the val that is going to be stored at destination register
 	cpu.reg_file_commit(_dest_src_reg, read_val);
 }
 
@@ -36,19 +19,7 @@ void store_instruction_t::execute(CPU& cpu) {
 	memory_addr_t addr = base_reg_val._unsigned + _offset;
 
 	data_t commit_val = source_reg_val;
-	switch (_type) {
-	case STORE_INSTRUCTION_TYPE::SB:
-		commit_val._unsigned &= (0x000000000000000F);
-		break;
-	case STORE_INSTRUCTION_TYPE::SH:
-		commit_val._unsigned &= (0x00000000FFFFFFFF);
-		break;
-	case STORE_INSTRUCTION_TYPE::SW:
-		break;
-	default:
-		break;
-	}
-	cpu.d_cache_commit(addr, commit_val);
+	cpu.d_cache_commit(_type,addr, commit_val);
 }
 
 void alu_instruction_t::execute(CPU& cpu) {
