@@ -162,8 +162,8 @@ data_t CPU::d_cache_read(load_instruction_t::LOAD_INSTRUCTION_TYPE mode, memory_
 	default:
 		break;
 
-		return result;
 	}
+	return result;
 }
 
 const data_t& CPU::reg_file_read(const reg_id_t& reg_id)  {
@@ -198,13 +198,15 @@ CPU::CPU(CPU::PREDICTOR_TYPE type) {
 }
 
 void CPU::execute() {
-	if (_pc >= _program.size() && !_halt) {
+	if (_pc >= _program.size()) {
 		_halt = true;
 		return;
 	}
 	if (_program[_pc]->is_label_instruction()) {
 		_pc++;
 	}
+	if (_pc >= _program.size())
+		return;
 	auto old_pc = _pc;
 	_program[_pc]->execute(*this);
 	if (old_pc == _pc)
