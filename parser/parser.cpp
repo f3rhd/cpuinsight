@@ -151,7 +151,11 @@ void parser_t::parse_mem_instruction() {
 
 	// we should be imm
 	EXPECT(TOKEN_TYPE::IMMEDIATE);
-	offset_t offset = std::stoll(_current_token->word);
+	offset_t offset{};
+	if (_current_token->word[0] == '0' && _current_token->word[1] == 'x')
+		offset = std::stoll(_current_token->word, nullptr, 16);
+	else
+		offset = std::stoll(_current_token->word);
 
 	advance();
 	// we should be left paranthesis
@@ -535,7 +539,11 @@ void parser_t::parse_pseudo_instruction() {
 		advance();
 		EXPECT(TOKEN_TYPE::IMMEDIATE);
 
-		int64_t imm_val = std::stoll(_current_token->word);
+		int64_t imm_val{};
+		if (_current_token->word[0] == '0' && _current_token->word[1] == 'x')
+			imm_val = std::stoll(_current_token->word, nullptr, 16);
+		else
+			imm_val = std::stoll(_current_token->word);
 
 		int32_t low = static_cast<int32_t>(imm_val << 52 >> 52);
 		int32_t high = static_cast<int32_t>(imm_val - low);
