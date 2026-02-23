@@ -546,7 +546,7 @@ void parser_t::parse_pseudo_instruction() {
 			imm_val = std::stoll(_current_token->word);
 
 		int32_t low = static_cast<int32_t>(imm_val << 52 >> 52);
-		int32_t high = static_cast<int32_t>(imm_val - low);
+		int32_t high = (static_cast<int32_t>(imm_val) - low) >> 12;
 
 		if (-2048 <= imm_val && (imm_val) <= 2047) {
 			_program.emplace_back(
@@ -560,19 +560,24 @@ void parser_t::parse_pseudo_instruction() {
 			);
 		}
 		else {
-			_program.emplace_back(
-				std::make_unique<load_upper_imm_instruction_t>(
-					dest_reg,
-					high
-				)
+			std::unique_ptr<instruction_t> instr1 = std::make_unique<load_upper_imm_instruction_t>(
+				dest_reg,
+				high
 			);
-			_program.emplace_back(
-				std::make_unique<alu_instruction_t>(
-					alu_instruction_t::ALU_INSTRUCTION_TYPE::ADD,
-					dest_reg,
-					dest_reg,
-					low,
-					true
+			std::unique_ptr<instruction_t> instr2 = std::make_unique<alu_instruction_t>(
+				alu_instruction_t::ALU_INSTRUCTION_TYPE::ADD,
+				dest_reg,
+				dest_reg,
+				low,
+				true
+			);
+			std::vector<std::unique_ptr<instruction_t>> expanded;
+			expanded.reserve(2); 
+			expanded.push_back(std::move(instr1));
+			expanded.push_back(std::move(instr2));
+			_program.push_back(
+				std::make_unique<expandable_instruction_t>(
+					std::move(expanded)
 				)
 			);
 		}

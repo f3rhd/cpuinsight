@@ -95,9 +95,9 @@ void alu_instruction_t::execute(CPU& cpu) {
 
 void load_upper_imm_instruction_t::execute(CPU& cpu) {
 
-	int32_t imm32 = (_upimm << 20) & 0xFFFFF000;
-
-	data_t commit_data = { static_cast<uint64_t>(static_cast<uint32_t>(imm32)) };
+	int32_t imm32 = static_cast<int32_t>((_upimm << 12) & 0xFFFFF000);
+	int64_t final_imm = static_cast<int64_t>(imm32);
+	data_t commit_data = { static_cast<uint64_t>(static_cast<uint32_t>(final_imm)) };
 	cpu.reg_file_commit(_dest_reg, commit_data);
 }
 
@@ -157,9 +157,15 @@ void jump_instruction_t::execute(CPU& cpu) {
 
 void auipc_instruction_t::execute(CPU& cpu) {
 	int64_t pc_val = cpu.get_pc();
-	int32_t imm32 = (_upimm << 20) & 0xFFFFF000;
-	int64_t val = (int64_t)(imm32);
+	int32_t imm32 = static_cast<int32_t>((_upimm << 12) & 0xFFFFF000);
+	int64_t final_imm = static_cast<int64_t>(imm32);
 	data_t commit_data = data_t();
-	commit_data._signed = pc_val + val;
+	commit_data._signed = pc_val + final_imm;
 	cpu.reg_file_commit(_dest_reg, commit_data);
+}
+
+void expandable_instruction_t::execute(CPU& cpu) {
+	for (auto& instr : _expanded_instructions) {
+		instr->execute(cpu);
+	}
 }

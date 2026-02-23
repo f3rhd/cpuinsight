@@ -1,6 +1,8 @@
 #pragma once
 #include "../aliases.h"
 #include <string>
+#include <vector>
+#include <memory>
 class CPU;
 struct instruction_t {
 	virtual void execute(CPU& cpu) = 0;
@@ -132,6 +134,12 @@ struct auipc_instruction_t : instruction_t {
 private:
 	reg_id_t _dest_reg;
 	int64_t _upimm;
+};
+struct expandable_instruction_t : instruction_t {
+	expandable_instruction_t(std::vector<std::unique_ptr<instruction_t>>&& expanded_instructions) : _expanded_instructions(std::move(expanded_instructions)) {}
+	void execute(CPU& cpu) override;
+private:
+	std::vector<std::unique_ptr<instruction_t>> _expanded_instructions;
 };
 struct branch_instruction_t : instruction_t {
 	enum class BRANCH_INSTRUCTION_TYPE
