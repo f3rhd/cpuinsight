@@ -1,6 +1,10 @@
 #include "instruction.h"
+#ifdef DEBUG_PRINTS
+#include "../parser/lookup.h"
+#endif
 #include "cpu.h"
 #include <iostream>
+#include <format>
 void load_instruction_t::execute(CPU& cpu) {
 	// get the base register value
 	data_t base_reg_val = cpu.reg_file_read(_base_reg);
@@ -9,6 +13,9 @@ void load_instruction_t::execute(CPU& cpu) {
 	// read from addr
 	data_t read_val = cpu.d_cache_read(_type,addr); // this is the val that is going to be stored at destination register
 	cpu.reg_file_commit(_dest_src_reg, read_val);
+#ifdef DEBUG_PRINTS
+	std::cout << std::format("Executing PC:{} Type: Load instruction : {} <- {}\n", cpu.get_pc(), lookup_t::reg_name(_dest_src_reg), read_val._signed);
+#endif
 }
 
 void store_instruction_t::execute(CPU& cpu) {
@@ -20,6 +27,9 @@ void store_instruction_t::execute(CPU& cpu) {
 
 	data_t commit_val = source_reg_val;
 	cpu.d_cache_commit(_type,addr, commit_val);
+#ifdef DEBUG_PRINTS
+	std::cout << std::format("Executing PC:{} Type: Store instruction : {} -> Mem[{}]\n", cpu.get_pc(), commit_val._signed,addr);
+#endif
 }
 
 void alu_instruction_t::execute(CPU& cpu) {
@@ -91,6 +101,9 @@ void alu_instruction_t::execute(CPU& cpu) {
 		break;
 	}
 	cpu.reg_file_commit(_dest_reg, result);
+#ifdef DEBUG_PRINTS
+	std::cout << std::format("Executing PC:{} Type: ALU instruction : {} <- {}\n", cpu.get_pc(), lookup_t::reg_name(_dest_reg),result._signed);
+#endif
 }
 
 void load_upper_imm_instruction_t::execute(CPU& cpu) {
@@ -99,6 +112,9 @@ void load_upper_imm_instruction_t::execute(CPU& cpu) {
 	int64_t final_imm = static_cast<int64_t>(imm32);
 	data_t commit_data = { static_cast<uint64_t>(static_cast<uint32_t>(final_imm)) };
 	cpu.reg_file_commit(_dest_reg, commit_data);
+#ifdef DEBUG_PRINTS
+	std::cout << std::format("Executing PC:{} Type: LUI instruction : {} <- {}\n", cpu.get_pc(), lookup_t::reg_name(_dest_reg), commit_data._signed);
+#endif
 }
 
 void branch_instruction_t::execute(CPU& cpu) {
@@ -138,6 +154,9 @@ void branch_instruction_t::execute(CPU& cpu) {
 	}
 	cpu.incr_total_branches();
 	cpu.update_bht(_id, should_branch);
+#ifdef DEBUG_PRINTS
+	std::cout << std::format("Executing PC:{} Type: Branch instruction : Branch Result={}\n", cpu.get_pc(), should_branch);
+#endif
 }
 
 void jump_instruction_t::execute(CPU& cpu) {
@@ -153,6 +172,9 @@ void jump_instruction_t::execute(CPU& cpu) {
 
 	}
 	cpu.reg_file_commit(_dest_reg, { pc_next });
+#ifdef DEBUG_PRINTS
+	std::cout << std::format("Executing PC:{} Type: Jump instruction : \n", cpu.get_pc());
+#endif
 }
 
 void auipc_instruction_t::execute(CPU& cpu) {
@@ -162,6 +184,9 @@ void auipc_instruction_t::execute(CPU& cpu) {
 	data_t commit_data = data_t();
 	commit_data._signed = pc_val + final_imm;
 	cpu.reg_file_commit(_dest_reg, commit_data);
+#ifdef DEBUG_PRINTS
+	std::cout << std::format("Executing PC:{} Type: AUIPC instruction : {} <- {}\n", cpu.get_pc(),lookup_t::reg_name(_dest_reg),commit_data._signed);
+#endif
 }
 
 void expandable_instruction_t::execute(CPU& cpu) {

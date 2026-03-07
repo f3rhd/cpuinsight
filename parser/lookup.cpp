@@ -60,6 +60,7 @@ lookup_t::_alui_instructions = {
 const std::unordered_map<std::string,alu_instruction_t::ALU_INSTRUCTION_TYPE>         
 lookup_t::_alur_instructions = {
     {"add", alu_instruction_t::ALU_INSTRUCTION_TYPE::ADD},
+    {"sub", alu_instruction_t::ALU_INSTRUCTION_TYPE::SUB},
     {"sll", alu_instruction_t::ALU_INSTRUCTION_TYPE::SLL},
     {"slt", alu_instruction_t::ALU_INSTRUCTION_TYPE::SLT},
     {"sltu", alu_instruction_t::ALU_INSTRUCTION_TYPE::SLTU},

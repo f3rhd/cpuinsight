@@ -144,12 +144,16 @@ data_t CPU::d_cache_read(load_instruction_t::LOAD_INSTRUCTION_TYPE mode, memory_
 		result._signed = static_cast<int32_t>(half);
 	}
 		break;
-	case load_instruction_t::LOAD_INSTRUCTION_TYPE::LW:
-		result._unsigned = (static_cast<uint32_t>(_d_cache[addr])) |
-		(static_cast<uint32_t>(_d_cache[addr + 1]) << 8) |
-		(static_cast<uint32_t>(_d_cache[addr + 2]) << 16) |
-		(static_cast<uint32_t>(_d_cache[addr + 3]) << 24);
+	case load_instruction_t::LOAD_INSTRUCTION_TYPE::LW: {
+		int32_t word = static_cast<int32_t>(
+			(static_cast<uint32_t>(_d_cache[addr])) |
+			(static_cast<uint32_t>(_d_cache[addr + 1]) << 8) |
+			(static_cast<uint32_t>(_d_cache[addr + 2]) << 16) |
+			(static_cast<uint32_t>(_d_cache[addr + 3]) << 24)
+			);
+		result._signed = word;
 		break;
+	}
 	case load_instruction_t::LOAD_INSTRUCTION_TYPE::LBU:
 		result._unsigned = static_cast<uint32_t>(_d_cache[addr]);
 		break;
