@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 f3rhd 
+//
+// SPDX-License-Identifier: MIT
+
 #include "branchpredictor.h"
 
 void simple_predictor_t::update(branch_instruction_id_t branch_id, bool branch_taken) {

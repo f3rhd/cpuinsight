@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 f3rhd 
+//
+// SPDX-License-Identifier: MIT
+
 #include "instruction.h"
 #ifdef DEBUG_PRINTS
 #include "../parser/lookup.h"

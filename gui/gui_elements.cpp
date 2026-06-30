@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2026 f3rhd 
+//
+// SPDX-License-Identifier: MIT
 
 #include "gui_elements.h"
 #include "../parser/lookup.h"

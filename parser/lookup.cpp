@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 f3rhd 
+//
+// SPDX-License-Identifier: MIT
+
 #include "lookup.h"
 
 const std::unordered_map<std::string,reg_id_t> 
